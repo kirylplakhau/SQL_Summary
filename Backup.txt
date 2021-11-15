@@ -1,0 +1,66 @@
+			**** РЕЗЕРВНОЕ КОПИРОВАНИЕ ****
+
+The SQL BACKUP DATABASE Statement
+The BACKUP DATABASE statement is used in SQL Server to create a full back up of an existing SQL database.
+
+	* Syntax *
+
+	BACKUP DATABASE databasename
+	O DISK = 'filepath';
+
+The SQL BACKUP WITH DIFFERENTIAL Statement
+A differential back up only backs up the parts of the database that have changed since the last full database backup.
+
+	* Syntax *
+
+	BACKUP DATABASE databasename
+	TO DISK = 'filepath'
+	WITH DIFFERENTIAL;
+
+* Tip: Always back up the database to a different drive than the actual database. Then, if you get a disk crash, 
+you will not lose your backup file along with the database.
+* Tip: A differential back up reduces the back up time (since only the changes are backed up).
+
+			**** ВОССТАНОВЛЕНИЕ БД ****
+
+Восстановления базы ** из дампа **
+	* Через phpMyAdmin *
+В основном, пользователи работают с MySQL через панель phpMyAdmin, поэтому ниже приведен наиболее простой способ сделать восстановление из бэкапа вручную. 
+Чтобы восстановить базу из дампа, нужно выполнить несколько действий:
+ 1. Открыть phpMyAdmin и выбрать требуемую БД.
+ 2. Затем перейти по ссылке «Импорт» – она находится в главном меню.
+ 3. В ней нужно найти и открыть раздел «Импортируемый файл», где нужно указать источник бэкапа базы.
+ 4. Подтвердить операцию нажатием «Вперед».
+ 5. Теперь остается только перезагрузить сервер MySQL.
+
+		** Из архива **
+
+Работает в случае, если базу данных Вы бекапили простым копированием ее каталога и его архивации в tar (или не архивации).
+
+1) Останавливаем MySQL сервер .
+
+для Debian/ubuntu:
+$ sudo /etc/init.d/mysql stop
+для CentOS/redhat:
+$ sudo /etc/init.d/mysqld stop
+для FreeBSD:
+$ sudo /usr/local/etc/rc.d/mysql-server stop
+2) Распаковываем базу из tar (если она запакована в tar-архив)
+
+$ tar -xf mydatabase.bak.tar
+3) Копируем извлеченный архив (вместе со всеми файлами внутри) по пути, где размещаются все базы данных MySQL. Лучше при этом старый каталог удалить (каталог базы данных, а не весь каталог MySQL, конечно).
+
+4) Проверяем атрибуты - дабы владельцем базы был MySQL. Лучше просто выполнить команду применения атрибутов:
+
+$ sudo chown -R mysql:mysql mydatabase
+где mydatabase - это имя каталога базы данных (при этом предполагается, что Вы находитесь в каталоге баз данных MySQL).
+
+5) Запускаем MySQL сервер обратно.
+
+для Debian/ubuntu:
+$ sudo /etc/init.d/mysql start
+для CentOS/redhat:
+$ sudo /etc/init.d/mysqld start
+для FreeBSD:
+$ sudo /usr/local/etc/rc.d/mysql-server start
+
